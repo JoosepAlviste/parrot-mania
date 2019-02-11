@@ -6,6 +6,7 @@ import { connectRouter } from 'connected-react-router';
 import { combineReducers } from 'redux';
 
 import application from 'ducks/application';
+import parrots from 'ducks/parrots';
 
 
 export default (history) => combineReducers({
@@ -15,4 +16,5 @@ export default (history) => combineReducers({
     loading: loadingReducer,
     user: userReducer,
     application,
+    parrots,
 });

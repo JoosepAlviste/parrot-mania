@@ -14,6 +14,8 @@ import signupWatcher from 'sagas/auth/signupSaga';
 import forgotPasswordWatcher from 'sagas/auth/forgotPasswordSaga';
 import resetPasswordWatcher from 'sagas/auth/resetPasswordSaga';
 
+import fetchUserParrots from 'sagas/parrots/fetchUserParrots';
+
 
 const Home = loadable(() => import('views/Home'));
 const RestrictedView = loadable(() => import('views/RestrictedView'));
@@ -22,6 +24,8 @@ const LoginView = loadable(() => import('views/auth/Login'));
 const SignupView = loadable(() => import('views/auth/Signup'));
 const ForgotPasswordView = loadable(() => import('views/auth/ForgotPassword'));
 const ResetPasswordView = loadable(() => import('views/auth/ResetPassword'));
+
+const ParrotsList = loadable(() => import('views/ParrotsList'));
 
 
 const NotFoundRoute = {
@@ -94,6 +98,15 @@ const routes = [
                         initial: logoutWorker,
                     },
                     NotFoundRoute,
+                ],
+            },
+            {
+                path: '/parrots',
+                exact: true,
+                name: 'parrots-list',
+                component: ParrotsList,
+                initial: [
+                    fetchUserParrots,
                 ],
             },
             NotFoundRoute,

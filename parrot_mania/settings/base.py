@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     # Local apps
     'accounts',
     'parrot_mania',
+    'parrots',
 
     # Third-party apps
     'rest_framework',
