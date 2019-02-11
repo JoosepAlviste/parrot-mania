@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+    Hello world from Django!
+    <div id="hello-container"></div>
+{% endblock content %}
+
+{% block scripts %}{{ block.super }}
+    <script>
+        parrot_mania.init();
+    </script>
+{% endblock %}
+

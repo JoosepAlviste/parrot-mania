@@ -1,0 +1,90 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load render_bundle from webpack_loader %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Parrot mania{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static "images/TODO.png" %}">
+
+    <script>
+        {# This can be used to pass relevant Django settings to the frontend app. #}
+        var DJ_CONST = {
+            {% for key, value in settings.items %}
+                "{{ key|escapejs }}": "{{ value|escapejs }}",
+            {% endfor %}
+            {% if request.user.is_authenticated %}
+                user: {
+                    id: {{ request.user.id }},
+                    email: "{{ request.user.email|escapejs }}",
+                    name: "{{ request.user.name|escapejs }}",
+                },
+            {% else %}
+                user: null,
+            {% endif %}
+        };
+    </script>
+
+    {# In production, don't include the styles js file (which is unused anyway) #}
+    {% if settings.DEBUG %}
+        {% render_bundle 'styles' %}
+    {% else %}
+        {% render_bundle 'styles' 'css' %}
+    {% endif %}
+    {% block css %}{% endblock css %}
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+
+<body class="{% block body_classes %}{% endblock %}">
+    <!--[if lte IE 9]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">Parrot mania</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#headerNavigation"
+                    aria-controls="headerNavigation" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="headerNavigation">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'home' %}">{% trans "Home" %}</a>
+                    </li>
+                    
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{{ request.user.name|default:request.user.email }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">{% trans "Log out" %}</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">{% trans "Log in" %}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        {% block content %}{% endblock content %}
+    </div>
+
+    {% render_bundle 'app' %}
+    {% block scripts %}{% endblock scripts %}
+  </body>
+</html>
+

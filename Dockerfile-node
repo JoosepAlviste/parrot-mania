@@ -1,0 +1,15 @@
+# Based on Node 10 Alpine image
+FROM node:10.15.1-alpine
+
+# Install system requirements
+RUN apk add --no-cache alpine-sdk python bash
+
+# Set the default directory where CMD will execute
+WORKDIR /app
+
+# Expose our application ports
+EXPOSE 8000
+EXPOSE 8001
+
+# Set the default command to execute when creating a new container
+CMD /bin/bash -c "npm install && npm run dev"

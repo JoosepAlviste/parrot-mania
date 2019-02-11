@@ -1,0 +1,42 @@
+# Based on Node 10 Alpine image
+FROM node:10.15.1-alpine
+
+# Set the default directory where CMD will execute
+WORKDIR /app
+
+# Expose our application port
+EXPOSE 80
+
+# Create a directory for the logs
+RUN mkdir -p /var/log/parrot_mania
+
+# Mark assets directory as volume
+VOLUME /files/assets
+
+# Copy package files
+COPY ./app/package.json ./
+COPY ./app/package-lock.json ./
+
+# Install node build dependencies
+RUN apk add --no-cache --virtual .build-deps alpine-sdk python
+
+# Install node dependencies
+RUN npm install --silent
+
+# Remove node build dependencies
+RUN apk del .build-deps
+
+# Copy some utility files
+COPY ./app/.babelrc ./
+COPY ./app/.eslintrc ./
+COPY ./app/.eslintignore ./
+COPY ./app/.stylelintrc ./
+
+# Copy code
+COPY ./app /app
+
+# Build node app
+RUN npm run build
+
+# Set the default command to execute when creating a new container
+CMD npm run start

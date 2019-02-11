@@ -1,0 +1,2 @@
+include conf.d/app.parrot_mania.proxy.include;
+proxy_pass http://parrot_mania_node;

@@ -1,0 +1,35 @@
+# Ignore everything in .idea
+.idea
+
+*.mo
+*.pyo
+*.pyc
+.sass-cache/
+npm-debug.log
+yarn-error.log
+node_modules/
+venv/
+.cache/
+
+.data/
+
+parrot_mania/django.env
+parrot_mania/settings/local.py
+parrot_mania/settings/local_test.py
+parrot_mania/db.sqlite3
+parrot_mania/assets/
+
+parrot_mania/.cache
+parrot_mania/.pytest_cache
+parrot_mania/.coverage
+parrot_mania/coverage
+parrot_mania/cover/
+
+# Node Project files
+app/build/
+app/coverage/
+
+# Django env
+parrot_mania/django.env
+
+parrot_mania/docs/_build
