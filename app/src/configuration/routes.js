@@ -15,6 +15,7 @@ import forgotPasswordWatcher from 'sagas/auth/forgotPasswordSaga';
 import resetPasswordWatcher from 'sagas/auth/resetPasswordSaga';
 
 import fetchUserParrots from 'sagas/parrots/fetchUserParrots';
+import createParrotWatcher from 'sagas/parrots/createParrot';
 
 
 const Home = loadable(() => import('views/Home'));
@@ -26,6 +27,7 @@ const ForgotPasswordView = loadable(() => import('views/auth/ForgotPassword'));
 const ResetPasswordView = loadable(() => import('views/auth/ResetPassword'));
 
 const ParrotsList = loadable(() => import('views/ParrotsList'));
+const CreateParrot = loadable(() => import('views/CreateParrot'));
 
 
 const NotFoundRoute = {
@@ -108,6 +110,13 @@ const routes = [
                 initial: [
                     fetchUserParrots,
                 ],
+            },
+            {
+                path: '/parrots/create',
+                exact: true,
+                name: 'create-parrots',
+                component: CreateParrot,
+                watcher: createParrotWatcher,
             },
             NotFoundRoute,
         ],
