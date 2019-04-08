@@ -11,7 +11,7 @@ export const setActiveLanguage = (language) => ({
 });
 
 
-function* setActiveLanguageSaga(setActiveLanguageAction) {
+function setActiveLanguageSaga(setActiveLanguageAction) {
     const currentLanguage = setActiveLanguageAction.language;
     const cookieLanguage = Cookies.get(SETTINGS.LANGUAGE_COOKIE_NAME);
 
