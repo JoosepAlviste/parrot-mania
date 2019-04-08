@@ -44,6 +44,7 @@ const statsFile = path.resolve(path.join(__dirname, '..', 'build', 'loadable-sta
  * This is pretty much copied from i18next-express-middleware but supports Koa.
  */
 const missingKeyHandler = (ctx, next) => {
+    const { i18n } = ctx.state;
     const { lng, ns } = ctx.params;
     const { body } = ctx.request;
 
@@ -54,7 +55,10 @@ const missingKeyHandler = (ctx, next) => {
     }
 
     for (let field in body) {
-        if (field === '_t') break  // XHR backend sends a timestamp
+        if (field === '_t') {
+            // XHR backend sends a timestamp which we don't want to save
+            break
+        }
         i18n.services.backendConnector.saveMissing(
             [lng],
             ns,
@@ -186,7 +190,7 @@ i18n
         defaultNS: 'translations',
 
         debug: false,
-        preload: ['en', 'et'],
+        preload: SETTINGS.LANGUAGE_ORDER,
         backend: {
             loadPath: `${publicDir}/locales/{{lng}}/{{ns}}.json`,
             addPath: `${publicDir}/locales/{{lng}}/{{ns}}.missing.json`,
