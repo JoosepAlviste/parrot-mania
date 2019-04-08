@@ -9,7 +9,7 @@ import { setActiveLanguage } from 'sagas/user/activateLanguage';
 
 
 const LanguageSwitch = ({ onSwitch }) => {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const changeLanguage = useCallback((languageCode) => {
         i18n.changeLanguage(languageCode);
         onSwitch(languageCode);
@@ -18,7 +18,7 @@ const LanguageSwitch = ({ onSwitch }) => {
     return (
         <>
             <p>
-                Active language: {i18n.language}
+                {t('Active language')}: {i18n.language}
             </p>
             {SETTINGS.LANGUAGE_ORDER.map((languageCode) => (
                 <Button

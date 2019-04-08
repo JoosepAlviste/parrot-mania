@@ -28,6 +28,9 @@ parrot_mania/cover/
 app/build/
 app/coverage/
 
+# Missing translations file
+*.missing.json
+
 # Django env
 parrot_mania/django.env
 

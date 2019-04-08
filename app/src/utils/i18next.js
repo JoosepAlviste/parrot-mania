@@ -5,11 +5,12 @@ import XHRBackend from 'i18next-xhr-backend';
 const isClientSide = process && !process.release;
 
 const options = {
+    fallbackLng: 'en',
     load: 'languageOnly',  // No region-specific locales (en-US, de-DE, etc.)
     ns: ['translations'],
     defaultNS: 'translations',
 
-    fallbackLng: 'en',
+    saveMissing: true,
     debug: true,
 
     interpolation: {

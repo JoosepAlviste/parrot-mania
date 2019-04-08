@@ -10,6 +10,7 @@ import Router from 'koa-router';
 import koaLogger from 'koa-logger';
 import koaResponseTime from 'koa-response-time';
 import koaUserAgent from 'koa-useragent';
+import koaBody from 'koa-body';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router';
@@ -36,101 +37,132 @@ const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 const publicDir = resolveApp('public');
 const statsFile = path.resolve(path.join(__dirname, '..', 'build', 'loadable-stats.json'));
 
+/**
+ * Handler for adding missing translations' keys. Assumes :lng and :ns parameter
+ * in URL.
+ *
+ * This is pretty much copied from i18next-express-middleware but supports Koa.
+ */
+const missingKeyHandler = (ctx, next) => {
+    const { lng, ns } = ctx.params;
+    const { body } = ctx.request;
+
+    if (!i18n.services.backendConnector) {
+        ctx.status = 400;
+        ctx.body = 'i18next-middleware:: no backend configured';
+        return;
+    }
+
+    for (let field in body) {
+        if (field === '_t') break  // XHR backend sends a timestamp
+        i18n.services.backendConnector.saveMissing(
+            [lng],
+            ns,
+            field,
+            body[field],
+        );
+    }
+
+    return next();
+};
+
 // Initialize `koa-router` and setup a route listening on `GET /*`
 // Logic has been splitted into two chained middleware functions
 // @see https://github.com/alexmingoia/koa-router#multiple-middleware
 const router = new Router();
-router.get(
-    '*',
-    async (ctx, next) => {
-        const { store } = configureStore({}, {
-            sagaMiddleware: {
-                context: {
-                    token: ctx.cookies.get(SETTINGS.AUTH_TOKEN_NAME),
+router
+    .post('/locales/add/:lng/:ns', missingKeyHandler)
+    .get(
+        '*',
+        async (ctx, next) => {
+            const { store } = configureStore({}, {
+                sagaMiddleware: {
+                    context: {
+                        token: ctx.cookies.get(SETTINGS.AUTH_TOKEN_NAME),
+                    },
                 },
-            },
-            location: ctx.originalUrl,
-        });
+                location: ctx.originalUrl,
+            });
 
-        // Set the language
-        const { language } = ctx.state;
-        i18n.changeLanguage(language);
-        ctx.logger.debug('Set language to: %s', language);
+            // Set the language
+            const { language } = ctx.state;
+            i18n.changeLanguage(language);
+            ctx.logger.debug('Set language to: %s', language);
 
-        const task = store.runSaga(ServerViewManagerWorker, routes, createLocationAction(store.getState().router));
+            const task = store.runSaga(ServerViewManagerWorker, routes, createLocationAction(store.getState().router));
 
-        store.close();
+            store.close();
 
-        await task.toPromise();
+            await task.toPromise();
 
-        const authState = isAuthenticated(store.getState());
-        ctx.logger.debug('Got auth state: %s', authState);
+            const authState = isAuthenticated(store.getState());
+            ctx.logger.debug('Got auth state: %s', authState);
 
-        const context = {};
-        const extractor = new ChunkExtractor({ statsFile, entrypoints: ['client'] });
+            const context = {};
+            const extractor = new ChunkExtractor({ statsFile, entrypoints: ['client'] });
 
-        ctx.state.markup = renderToString((
-            <ChunkExtractorManager extractor={extractor}>
-                <I18nextProvider i18n={i18n}>
-                    <Provider store={store}>
-                        <StaticRouter context={context} location={ctx.url}>
-                            <RenderChildren routes={routes} />
-                        </StaticRouter>
-                    </Provider>
-                </I18nextProvider>
-            </ChunkExtractorManager>
-        ));
-        ctx.state.helmet = Helmet.renderStatic();
+            ctx.state.markup = renderToString((
+                <ChunkExtractorManager extractor={extractor}>
+                    <I18nextProvider i18n={i18n}>
+                        <Provider store={store}>
+                            <StaticRouter context={context} location={ctx.url}>
+                                <RenderChildren routes={routes} />
+                            </StaticRouter>
+                        </Provider>
+                    </I18nextProvider>
+                </ChunkExtractorManager>
+            ));
+            ctx.state.helmet = Helmet.renderStatic();
 
-        if (context.url) {
-            return ctx.redirect(context.url);
-        }
+            if (context.url) {
+                return ctx.redirect(context.url);
+            }
 
-        // Provide script tags forward
-        ctx.state.statusCode = context.statusCode;
-        ctx.state.linkTags = extractor.getLinkTags();
-        ctx.state.scriptTags = extractor.getScriptTags();
-        ctx.state.styleTags = extractor.getStyleTags();
+            // Provide script tags forward
+            ctx.state.statusCode = context.statusCode;
+            ctx.state.linkTags = extractor.getLinkTags();
+            ctx.state.scriptTags = extractor.getScriptTags();
+            ctx.state.styleTags = extractor.getStyleTags();
 
-        // Serialize state
-        ctx.state.serializedState = serialize(store.getState());
+            // Serialize state
+            ctx.state.serializedState = serialize(store.getState());
 
-        return next();
-    },
-    (ctx, next) => {
-        const { i18n } = ctx.state;
-        const initialI18nStore = i18n.languages.reduce((acc, language) => ({
-            ...acc,
-            [language]: i18n.services.resourceStore.data[language],
-        }), {});
-        const safeInitialI18nStore = encodeURI(
-            JSON.stringify(initialI18nStore),
-        );
+            return next();
+        },
+        (ctx, next) => {
+            const { i18n } = ctx.state;
+            const initialI18nStore = i18n.languages.reduce((acc, language) => ({
+                ...acc,
+                [language]: i18n.services.resourceStore.data[language],
+            }), {});
+            const safeInitialI18nStore = encodeURI(
+                JSON.stringify(initialI18nStore),
+            );
 
-        ctx.status = ctx.state.statusCode || 200;
-        ctx.body = `<!doctype html>
-        <html ${ctx.state.helmet.htmlAttributes.toString()}>
-        <head>
-            ${ctx.state.helmet.title.toString()}
-            ${ctx.state.helmet.link.toString()}
-            ${ctx.state.helmet.meta.toString()}
-            ${ctx.state.helmet.style.toString()}
-            ${ctx.state.linkTags}
-            ${ctx.state.styleTags}
-        </head>
-        <body ${ctx.state.helmet.bodyAttributes.toString()}>
-            <div id="root">${ctx.state.markup}</div>
-            ${ctx.state.scriptTags}
-            <script>
-            window.__initial_state__ = ${ctx.state.serializedState};
-            window.__initial_i18n_store__ = JSON.parse(decodeURI("${safeInitialI18nStore}"));
-            window.__initial_language__ = '${ctx.state.language}';
-            </script>
-        </body>
-    </html>`;
-        return next();
-    },
-);
+            ctx.status = ctx.state.statusCode || 200;
+            ctx.body = `<!doctype html>
+            <html ${ctx.state.helmet.htmlAttributes.toString()}>
+            <head>
+                ${ctx.state.helmet.title.toString()}
+                ${ctx.state.helmet.link.toString()}
+                ${ctx.state.helmet.meta.toString()}
+                ${ctx.state.helmet.style.toString()}
+                ${ctx.state.linkTags}
+                ${ctx.state.styleTags}
+            </head>
+            <body ${ctx.state.helmet.bodyAttributes.toString()}>
+                <div id="root">${ctx.state.markup}</div>
+                ${ctx.state.scriptTags}
+                <script>
+                window.__initial_state__ = ${ctx.state.serializedState};
+                window.__initial_i18n_store__ = JSON.parse(decodeURI("${safeInitialI18nStore}"));
+                window.__initial_language__ = '${ctx.state.language}';
+                </script>
+            </body>
+        </html>`;
+            return next();
+        },
+    );
 
 
 const server = new Koa();
@@ -157,6 +189,7 @@ i18n
         preload: ['en', 'et'],
         backend: {
             loadPath: `${publicDir}/locales/{{lng}}/{{ns}}.json`,
+            addPath: `${publicDir}/locales/{{lng}}/{{ns}}.missing.json`,
         },
     }, () => {
         server
@@ -168,6 +201,8 @@ i18n
             // `koa-helmet` provides security headers to help prevent common, well known attacks
             // @see https://helmetjs.github.io/
             .use(koaHelmet())
+            // Parse body of the request, required for adding missing translations
+            .use(koaBody())
             // Process language to context state
             .use((ctx, next) => {
                 const language = ctx.cookies.get(SETTINGS.LANGUAGE_COOKIE_NAME) || SETTINGS.DEFAULT_LANGUAGE;
