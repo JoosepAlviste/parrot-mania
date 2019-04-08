@@ -4,7 +4,6 @@ import { initReactI18next } from 'react-i18next';
 i18n
     .use(initReactI18next)
     .init({
-        lng: 'et',
         fallbackLng: 'en',
         debug: true,
 

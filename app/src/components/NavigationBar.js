@@ -6,7 +6,6 @@ import { Link, withRouter } from 'react-router-dom';
 import { Nav, Navbar, NavbarBrand, NavItem, NavLink } from 'reactstrap';
 
 import { urlResolve } from 'configuration/routes';
-import { applicationSelectors } from 'ducks/application';
 import SETTINGS from 'settings';
 import { gettext } from 'utils/i18n';
 import { UserShape } from 'utils/types';
