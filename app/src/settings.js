@@ -2,7 +2,7 @@ const SETTINGS = {
     API_BASE: '/api/',
     AUTH_TOKEN_NAME: 'parrot_mania_token',
     // KEEP `AUTH_TOKEN_LIFETIME` IN SYNC WITH backend ACCESS_TOKEN_LIFETIME
-    AUTH_TOKEN_LIFETIME: { minutes: 30 },
+    AUTH_TOKEN_LIFETIME: 30, // This value is in minutes
     AUTH_REFRESH_TOKEN_NAME: 'parrot_mania_refresh_token',
     LANGUAGE_COOKIE_NAME: 'parrot_mania_language',
     CSRF_COOKIE_NAME: 'csrftoken',
