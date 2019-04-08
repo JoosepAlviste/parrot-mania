@@ -74,7 +74,6 @@ NavigationBar.defaultProps = {
 
 const mapStateToProps = (state) => ({
     user: getUser(state),
-    activeLanguage: applicationSelectors.activeLanguage(state),
     isAuthenticated: isAuthenticated(state),
 });
 
