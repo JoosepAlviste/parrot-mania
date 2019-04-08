@@ -12,6 +12,7 @@ import routes from 'configuration/routes';
 import { setActiveLanguage, applicationSelectors } from 'ducks/application';
 import SETTINGS from 'settings';
 import Sentry from 'services/sentry';
+import 'utils/i18next';
 
 
 // Configure Sentry only in production
