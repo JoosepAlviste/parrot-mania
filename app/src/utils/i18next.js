@@ -1,48 +1,34 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import XHRBackend from 'i18next-xhr-backend';
 
-i18n
-    .use(initReactI18next)
-    .init({
-        fallbackLng: 'en',
-        debug: true,
+const isClientSide = process && !process.release;
 
-        interpolation: {
-            escapeValue: false,
-        },
+const options = {
+    load: 'languageOnly',  // No region-specific locales (en-US, de-DE, etc.)
+    ns: ['translations'],
+    defaultNS: 'translations',
 
-        resources: {
-            en: {
-                translation: {
-                    'Hello world!': 'Hello world!',
-                    'Signup': 'Signup',
-                    'Login': 'Login',
-                    'Logout': 'Logout',
-                    'Admin panel': 'Admin panel',
-                    'Restricted view': 'Restricted view',
-                    'Page not Found': 'Page not found',
-                    'Insufficient permissions': 'Insufficient permissions',
-                    'You don\'t have permissions to access this page':
-                        'You don\'t have permissions to access this page',
-                    'Forgot password': 'Forgot password',
-                },
-            },
-            et: {
-                translation: {
-                    'Hello world!': 'Tere maailm!',
-                    'Signup': 'Registreeru',
-                    'Login': 'Logi sisse',
-                    'Logout': 'Logi välja',
-                    'Admin panel': 'Administratsioon',
-                    'Restricted view': 'Piiratud vaade',
-                    'Page not Found': 'Lehekülge ei leitud',
-                    'Insufficient permissions': 'Pole piisavalt õigusi',
-                    'You don\'t have permissions to access this page':
-                        'Teil pole piisavalt õigusi, et seda lehekülge näha',
-                    'Forgot password': 'Unustasid parooli?',
-                },
-            },
-        },
-    });
+    fallbackLng: 'en',
+    debug: true,
+
+    interpolation: {
+        escapeValue: false,  // Not needed for React
+    },
+    
+    wait: isClientSide,
+};
+
+// In the browser use XHR backend and init react-i18next
+if (isClientSide) {
+    i18n
+        .use(XHRBackend)
+        .use(initReactI18next);
+}
+
+// Only initialize if i18next has not yet been initialized
+if (!i18n.isInitialized) {
+    i18n.init(options);
+}
 
 export default i18n;

@@ -1,6 +1,6 @@
 import '@tg-resources/fetch-runtime';
 import { loadableReady } from '@loadable/component';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { hydrate } from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
@@ -44,11 +44,13 @@ const currentLanguage = stateLanguage || cookieLanguage || SETTINGS.DEFAULT_LANG
 const renderApp = (appRoutes) => {
     hydrate(
         <I18nextProvider i18n={i18n}>
-            <Provider store={store}>
-                <ConnectedRouter history={history}>
-                    <RenderChildren routes={appRoutes} />
-                </ConnectedRouter>
-            </Provider>
+            <Suspense fallback={<div>Loading translations...</div>}>
+                <Provider store={store}>
+                    <ConnectedRouter history={history}>
+                        <RenderChildren routes={appRoutes} />
+                    </ConnectedRouter>
+                </Provider>
+            </Suspense>
         </I18nextProvider>,
         document.getElementById('root'),
     );
