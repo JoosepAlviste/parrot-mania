@@ -25,7 +25,7 @@ import FSBackend from 'i18next-node-fs-backend';
 import configureStore from 'configuration/configureStore';
 import routes from 'configuration/routes';
 import SETTINGS from 'settings';
-import i18n from 'utils/i18next';
+import i18n from 'utils/i18n';
 
 import proxyFactory from './appProxy';
 import errorHandler from './errorHandler';

@@ -13,7 +13,7 @@ import routes from 'configuration/routes';
 import { setActiveLanguage } from 'sagas/user/activateLanguage';
 import SETTINGS from 'settings';
 import Sentry from 'services/sentry';
-import i18n from 'utils/i18next';
+import i18n from 'utils/i18n';
 
 
 // Configure Sentry only in production
