@@ -2,10 +2,10 @@ import React, { useCallback } from 'react';
 import { Button } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
+import * as PropTypes from 'prop-types';
 
 import SETTINGS from 'settings';
-import { setActiveLanguage } from 'ducks/application';
-import * as PropTypes from 'prop-types';
+import { setActiveLanguage } from 'sagas/user/activateLanguage';
 
 
 const LanguageSwitch = ({ onSwitch }) => {

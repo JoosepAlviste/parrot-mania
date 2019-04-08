@@ -10,7 +10,7 @@ import { I18nextProvider } from 'react-i18next';
 
 import configureStore from 'configuration/configureStore';
 import routes from 'configuration/routes';
-import { setActiveLanguage } from 'ducks/application';
+import { setActiveLanguage } from 'sagas/user/activateLanguage';
 import SETTINGS from 'settings';
 import Sentry from 'services/sentry';
 import i18n from 'utils/i18next';
