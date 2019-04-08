@@ -31,7 +31,7 @@ services:
             dockerfile: Dockerfile-node.production
         container_name: parrot_mania_node
         restart: unless-stopped
-        command: npm run start
+        command: yarn start
         volumes:
             - "/var/lib/docker-nginx/files/parrot_mania/app/assets:/files/assets"
             - "/var/log/parrot_mania:/var/log/parrot_mania"

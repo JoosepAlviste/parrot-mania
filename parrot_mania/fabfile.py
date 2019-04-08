@@ -630,7 +630,7 @@ def repo_type():
 
 
 def collectstatic():
-    docker_compose_run('node', 'npm run export-assets', name='parrot_mania_npm_export')
+    docker_compose_run('node', 'yarn export-assets', name='parrot_mania_yarn_export')
     management_cmd('collectstatic --noinput --ignore styles-src')
 
 
