@@ -18,11 +18,12 @@ import { Provider } from 'react-redux';
 import serialize from 'serialize-javascript';
 import addYears from 'date-fns/add_years';
 import { RenderChildren } from 'tg-named-routes';
+import { I18nextProvider } from 'react-i18next';
 
 import configureStore from 'configuration/configureStore';
 import routes from 'configuration/routes';
-import { setActiveLanguage } from 'ducks/application';
 import SETTINGS from 'settings';
+import i18n from 'utils/i18next';
 
 import proxyFactory from './appProxy';
 import errorHandler from './errorHandler';
@@ -49,7 +50,7 @@ router.get(
 
         // Set the language
         const { language } = ctx.state;
-        store.dispatch(setActiveLanguage(language));
+        i18n.changeLanguage(language);
         ctx.logger.debug('Set language to: %s', language);
 
         const task = store.runSaga(ServerViewManagerWorker, routes, createLocationAction(store.getState().router));
@@ -66,11 +67,13 @@ router.get(
 
         ctx.state.markup = renderToString((
             <ChunkExtractorManager extractor={extractor}>
-                <Provider store={store}>
-                    <StaticRouter context={context} location={ctx.url}>
-                        <RenderChildren routes={routes} />
-                    </StaticRouter>
-                </Provider>
+                <I18nextProvider i18n={i18n}>
+                    <Provider store={store}>
+                        <StaticRouter context={context} location={ctx.url}>
+                            <RenderChildren routes={routes} />
+                        </StaticRouter>
+                    </Provider>
+                </I18nextProvider>
             </ChunkExtractorManager>
         ));
         ctx.state.helmet = Helmet.renderStatic();

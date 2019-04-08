@@ -6,13 +6,14 @@ import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import Cookies from 'js-cookie';
 import { RenderChildren } from 'tg-named-routes';
+import { I18nextProvider } from 'react-i18next';
 
 import configureStore from 'configuration/configureStore';
 import routes from 'configuration/routes';
-import { setActiveLanguage, applicationSelectors } from 'ducks/application';
+import { setActiveLanguage } from 'ducks/application';
 import SETTINGS from 'settings';
 import Sentry from 'services/sentry';
-import 'utils/i18next';
+import i18n from 'utils/i18next';
 
 
 // Configure Sentry only in production
@@ -33,7 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 const { store, history } = configureStore(initialState);
 
 // Get correct language from store and cookies
-const stateLanguage = applicationSelectors.activeLanguage(store.getState());
+const stateLanguage = i18n.language;
 const cookieLanguage = Cookies.get(SETTINGS.LANGUAGE_COOKIE_NAME);
 
 // Get valid language
@@ -42,11 +43,13 @@ const currentLanguage = stateLanguage || cookieLanguage || SETTINGS.DEFAULT_LANG
 
 const renderApp = (appRoutes) => {
     hydrate(
-        <Provider store={store}>
-            <ConnectedRouter history={history}>
-                <RenderChildren routes={appRoutes} />
-            </ConnectedRouter>
-        </Provider>,
+        <I18nextProvider i18n={i18n}>
+            <Provider store={store}>
+                <ConnectedRouter history={history}>
+                    <RenderChildren routes={appRoutes} />
+                </ConnectedRouter>
+            </Provider>
+        </I18nextProvider>,
         document.getElementById('root'),
     );
 };
@@ -56,6 +59,7 @@ loadableReady().then(() => {
     // Update language if necessary
     if (stateLanguage !== currentLanguage) {
         store.dispatch(setActiveLanguage(currentLanguage));
+        i18n.changeLanguage(currentLanguage);
     }
 
     renderApp(routes);
