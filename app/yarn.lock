@@ -2965,7 +2965,7 @@ cookie@0.3.1, cookie@>=0.3.1:
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
   integrity sha1-5+Ch+e9DtMi6klxcWpboBtFoc7s=
 
-cookies@^0.7.0, cookies@^0.7.1, cookies@~0.7.1:
+cookies@~0.7.1:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/cookies/-/cookies-0.7.3.tgz#7912ce21fbf2e8c2da70cf1c3f351aecf59dadfa"
   integrity sha512-+gixgxYSgQLTaTIilDHAdlNPZDENDQernEMiIcZpYYP14zgHsCt4Ce1FEjFtcp6GefhozebB6orvhAAWx/IS0A==
@@ -5347,11 +5347,6 @@ i18next-xhr-backend@^2.0.1:
   resolved "https://registry.yarnpkg.com/i18next-xhr-backend/-/i18next-xhr-backend-2.0.1.tgz#7af735ee1b0c6d4ce49fa5756591040a0fba6db7"
   integrity sha512-CP0XPjJsTE4hY1rM1KXFYo63Ib61EBLEcTvMDyJwr0vs9p/UTuA3ENCmzSs9+ghZgWSjdOigc0oUERHaxctbsQ==
 
-i18next@^10.2.2:
-  version "10.6.0"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-10.6.0.tgz#90ffd9f9bc617f34b9a12e037260f524445f7684"
-  integrity sha1-kP/Z+bxhfzS5oS4DcmD1JERfdoQ=
-
 i18next@^15.0.9:
   version "15.0.9"
   resolved "https://registry.yarnpkg.com/i18next/-/i18next-15.0.9.tgz#42536407a921bb5a8535a4c090a26f16827a1884"
@@ -6676,22 +6671,6 @@ koa-helmet@4.0.0:
   integrity sha512-WBimFdr0B8PVvDqdFCmx1eJ08jxvyIzNit8qFBxWn6rY/QjU+VLgc5JGnc757uYhZc2TgPirctGBG6P7yC0TEw==
   dependencies:
     helmet "^3.12.0"
-
-koa-i18next-detector@^0.7.1:
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/koa-i18next-detector/-/koa-i18next-detector-0.7.2.tgz#cbb0226b241182675e75603e641f2b14b5e43920"
-  integrity sha512-RXgwEB7ADH9h5380v94Gk7i82+PxSap5BKf+XC+aYAKEoPiqnn6i2mNYuO3801hADLutb5YBCMqvIe1xpT+5hw==
-  dependencies:
-    cookies "^0.7.0"
-
-koa-i18next-middleware@^1.1.10:
-  version "1.1.10"
-  resolved "https://registry.yarnpkg.com/koa-i18next-middleware/-/koa-i18next-middleware-1.1.10.tgz#66e2f9d8e26ecc7e263bc374016e3054dab943e3"
-  integrity sha512-qBiehsoIBquD7xsoiBSxyTwGJmEG8lViHHBsAWeTS1TVjySV3glR+C7LaddyM/Q7+e1deXoSiR9E7Typ3TEe4Q==
-  dependencies:
-    cookies "^0.7.1"
-    i18next "^10.2.2"
-    koa-i18next-detector "^0.7.1"
 
 koa-is-json@^1.0.0:
   version "1.0.0"
