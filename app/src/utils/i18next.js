@@ -15,7 +15,7 @@ const options = {
     interpolation: {
         escapeValue: false,  // Not needed for React
     },
-    
+
     wait: isClientSide,
 };
 

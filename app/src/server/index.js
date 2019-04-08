@@ -19,6 +19,7 @@ import serialize from 'serialize-javascript';
 import addYears from 'date-fns/add_years';
 import { RenderChildren } from 'tg-named-routes';
 import { I18nextProvider } from 'react-i18next';
+import FSBackend from 'i18next-node-fs-backend';
 
 import configureStore from 'configuration/configureStore';
 import routes from 'configuration/routes';
@@ -30,6 +31,9 @@ import errorHandler from './errorHandler';
 import logger from './logger';
 
 
+const appDirectory = path.resolve(path.join(__dirname, '..'));
+const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+const publicDir = resolveApp('public');
 const statsFile = path.resolve(path.join(__dirname, '..', 'build', 'loadable-stats.json'));
 
 // Initialize `koa-router` and setup a route listening on `GET /*`
@@ -94,6 +98,15 @@ router.get(
         return next();
     },
     (ctx, next) => {
+        const { i18n } = ctx.state;
+        const initialI18nStore = i18n.languages.reduce((acc, language) => ({
+            ...acc,
+            [language]: i18n.services.resourceStore.data[language],
+        }), {});
+        const safeInitialI18nStore = encodeURI(
+            JSON.stringify(initialI18nStore),
+        );
+
         ctx.status = ctx.state.statusCode || 200;
         ctx.body = `<!doctype html>
         <html ${ctx.state.helmet.htmlAttributes.toString()}>
@@ -108,7 +121,11 @@ router.get(
         <body ${ctx.state.helmet.bodyAttributes.toString()}>
             <div id="root">${ctx.state.markup}</div>
             ${ctx.state.scriptTags}
-            <script>window.__initial_state__ = ${ctx.state.serializedState};</script>
+            <script>
+            window.__initial_state__ = ${ctx.state.serializedState};
+            window.__initial_i18n_store__ = JSON.parse(decodeURI("${safeInitialI18nStore}"));
+            window.__initial_language__ = '${ctx.state.language}';
+            </script>
         </body>
     </html>`;
         return next();
@@ -129,30 +146,45 @@ if (process.env.NODE_ENV !== 'production') {
 // Configure proxy services
 proxyFactory(server, SETTINGS.APP_PROXY || {});
 
-server
-    .use(errorHandler(process.env.RAZZLE_RAVEN_BACKEND_DSN))
-    // Add response time to headers
-    .use(koaResponseTime())
-    // Add user agent parsing
-    .use(koaUserAgent)
-    // `koa-helmet` provides security headers to help prevent common, well known attacks
-    // @see https://helmetjs.github.io/
-    .use(koaHelmet())
-    // Process language to context state
-    .use((ctx, next) => {
-        const language = ctx.cookies.get(SETTINGS.LANGUAGE_COOKIE_NAME) || SETTINGS.DEFAULT_LANGUAGE;
+i18n
+    // Load translations through the filesystem on the server side
+    .use(FSBackend)
+    .init({
+        ns: ['translations'],
+        defaultNS: 'translations',
 
-        ctx.state.language = language;
-        ctx.logger.debug('Language: %s', language);
-        ctx.cookies.set(SETTINGS.LANGUAGE_COOKIE_NAME, language, {
-            expires: addYears(new Date(), 1), httpOnly: false,
-        });
+        debug: false,
+        preload: ['en', 'et'],
+        backend: {
+            loadPath: `${publicDir}/locales/{{lng}}/{{ns}}.json`,
+        },
+    }, () => {
+        server
+            .use(errorHandler(process.env.RAZZLE_RAVEN_BACKEND_DSN))
+            // Add response time to headers
+            .use(koaResponseTime())
+            // Add user agent parsing
+            .use(koaUserAgent)
+            // `koa-helmet` provides security headers to help prevent common, well known attacks
+            // @see https://helmetjs.github.io/
+            .use(koaHelmet())
+            // Process language to context state
+            .use((ctx, next) => {
+                const language = ctx.cookies.get(SETTINGS.LANGUAGE_COOKIE_NAME) || SETTINGS.DEFAULT_LANGUAGE;
 
-        return next();
+                ctx.state.language = language;
+                ctx.state.i18n = i18n;
+                ctx.logger.debug('Language: %s', language);
+                ctx.cookies.set(SETTINGS.LANGUAGE_COOKIE_NAME, language, {
+                    expires: addYears(new Date(), 1), httpOnly: false,
+                });
+
+                return next();
+            })
+            // Serve static files located under `process.env.RAZZLE_PUBLIC_DIR`
+            .use(koaServe(process.env.RAZZLE_PUBLIC_DIR))
+            .use(router.routes())
+            .use(router.allowedMethods());
     })
-    // Serve static files located under `process.env.RAZZLE_PUBLIC_DIR`
-    .use(koaServe(process.env.RAZZLE_PUBLIC_DIR))
-    .use(router.routes())
-    .use(router.allowedMethods());
 
 export default server;

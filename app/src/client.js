@@ -1,12 +1,12 @@
 import '@tg-resources/fetch-runtime';
 import { loadableReady } from '@loadable/component';
-import React, { Suspense } from 'react';
+import React from 'react';
 import { hydrate } from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import Cookies from 'js-cookie';
 import { RenderChildren } from 'tg-named-routes';
-import { I18nextProvider } from 'react-i18next';
+import { useSSR } from 'react-i18next';
 
 import configureStore from 'configuration/configureStore';
 import routes from 'configuration/routes';
@@ -41,17 +41,27 @@ const cookieLanguage = Cookies.get(SETTINGS.LANGUAGE_COOKIE_NAME);
 const currentLanguage = stateLanguage || cookieLanguage || SETTINGS.DEFAULT_LANGUAGE;
 
 
+const App = ({ appRoutes }) => {
+    // Load translations that were sent with the initial HTML from the server
+    useSSR(
+        /* eslint-disable no-underscore-dangle */
+        window.__initial_i18n_store__,
+        window.__initial_language__,
+        /* eslint-enable no-underscore-dangle */
+    );
+
+    return (
+        <Provider store={store}>
+            <ConnectedRouter history={history}>
+                <RenderChildren routes={appRoutes} />
+            </ConnectedRouter>
+        </Provider>
+    );
+};
+
 const renderApp = (appRoutes) => {
     hydrate(
-        <I18nextProvider i18n={i18n}>
-            <Suspense fallback={<div>Loading translations...</div>}>
-                <Provider store={store}>
-                    <ConnectedRouter history={history}>
-                        <RenderChildren routes={appRoutes} />
-                    </ConnectedRouter>
-                </Provider>
-            </Suspense>
-        </I18nextProvider>,
+        <App appRoutes={appRoutes} />,
         document.getElementById('root'),
     );
 };
