@@ -10,7 +10,7 @@ import { urlResolve } from 'configuration/routes';
 import SignupForm from 'forms/auth/Signup';
 import withView from 'decorators/withView';
 import { signup } from 'sagas/auth/signupSaga';
-import { pgettext } from 'utils/i18n';
+import { pgettext } from 'utils/text';
 import { RouterLocationShape } from 'utils/types';
 
 

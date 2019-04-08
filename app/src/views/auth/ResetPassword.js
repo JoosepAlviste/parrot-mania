@@ -7,7 +7,7 @@ import AuthLayout from 'components/layouts/AuthLayout';
 import ResetPasswordForm from 'forms/auth/ResetPassword';
 import withView from 'decorators/withView';
 import { resetPassword } from 'sagas/auth/resetPasswordSaga';
-import { pgettext } from 'utils/i18n';
+import { pgettext } from 'utils/text';
 import { RouterMatchShape } from 'utils/types';
 
 
