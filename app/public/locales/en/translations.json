@@ -1,0 +1,13 @@
+{
+  "Hello world!": "Hello world!",
+  "Signup": "Signup",
+  "Login": "Login",
+  "Logout": "Logout",
+  "Admin panel": "Admin panel",
+  "Restricted view": "Restricted view",
+  "Page not Found": "Page not found",
+  "Insufficient permissions": "Insufficient permissions",
+  "You don't have permissions to access this page": "You don't have permissions to access this page",
+  "Forgot password": "Forgot password",
+  "Active language": "Active language"
+}

@@ -2,7 +2,7 @@ import { ConnectedRedirect } from '@thorgate/spa-pending-data';
 import React from 'react';
 import PropTypes from 'prop-types';
 import qs from 'qs';
-import Helmet from 'react-helmet';
+import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 
 import AuthLayout from 'components/layouts/AuthLayout';
@@ -10,7 +10,7 @@ import { urlResolve } from 'configuration/routes';
 import SignupForm from 'forms/auth/Signup';
 import withView from 'decorators/withView';
 import { signup } from 'sagas/auth/signupSaga';
-import { pgettext } from 'utils/i18n';
+import { pgettext } from 'utils/text';
 import { RouterLocationShape } from 'utils/types';
 
 

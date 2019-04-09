@@ -1,13 +1,18 @@
-import { select, takeLatest } from 'redux-saga/effects';
+import { takeLatest } from 'redux-saga/effects';
 import Cookies from 'js-cookie';
 
 import SETTINGS from 'settings';
-import { SET_ACTIVE_LANGUAGE } from 'ducks/application';
-import { applicationSelectors } from 'ducks/application';
+
+const SET_ACTIVE_LANGUAGE = 'sagas/user/SET_ACTIVE_LANGUAGE';
+
+export const setActiveLanguage = (language) => ({
+    type: SET_ACTIVE_LANGUAGE,
+    language,
+});
 
 
-function* setActiveLanguage() {
-    const currentLanguage = yield select(applicationSelectors.activeLanguage);
+function setActiveLanguageSaga(setActiveLanguageAction) {
+    const currentLanguage = setActiveLanguageAction.language;
     const cookieLanguage = Cookies.get(SETTINGS.LANGUAGE_COOKIE_NAME);
 
     // Update language cookie
@@ -18,5 +23,5 @@ function* setActiveLanguage() {
 
 
 export default function* activeLanguageWatcher() {
-    yield takeLatest(SET_ACTIVE_LANGUAGE, setActiveLanguage);
+    yield takeLatest(SET_ACTIVE_LANGUAGE, setActiveLanguageSaga);
 }

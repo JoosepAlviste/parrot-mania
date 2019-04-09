@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 
 import { urlResolve } from 'configuration/routes';
 import FormField from 'forms/fields/FormField';
-import { gettext, pgettext } from 'utils/i18n';
+import { gettext, pgettext } from 'utils/text';
 import { getFormPropTypes } from 'utils/types';
 
 
